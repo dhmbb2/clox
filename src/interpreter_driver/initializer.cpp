@@ -37,6 +37,7 @@ void runPrompt() {
 }
 
 void run(const std::string& source) {
-
+    std::cout << source;
 }
+
 }
