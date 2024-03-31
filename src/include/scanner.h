@@ -39,7 +39,7 @@ public:
 
   bool
   isDigit(char c) {
-    return (c >= '0' and c <='9');
+    return (c >= '0' && c <='9');
   }
 
   bool 
@@ -49,7 +49,7 @@ public:
 
   bool 
   isAlphaDigit(char c) {
-    return isAlpha(c) || isdigit(c);
+    return isAlpha(c) || isDigit(c);
   }
 
   void
@@ -62,7 +62,7 @@ public:
     TokenType type,
     Value literal
   ) {
-    std::string lexeme = _source.substr(_start, _cur);
+    std::string lexeme = _source.substr(_start, _cur - _start);
     _tokens.push_back(Token{type, {lexeme}, {literal}, _line});
   }
 

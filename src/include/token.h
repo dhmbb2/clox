@@ -48,7 +48,7 @@ public:
   static std::string
   toString(Token token) {
     std::string lexeme = token._lexeme.value_or("");
-    return type2string(token._type) + lexeme + std::to_string(token._line);
+    return type2string(token._type) + " " + lexeme + " " +std::to_string(token._line);
   }
 
   TokenType _type;

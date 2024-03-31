@@ -23,7 +23,7 @@ Scanner::match(char expected) {
 /// @return return the next character
 char
 Scanner::peek() {
-  if (isAtEnd()) return false;
+  if (isAtEnd()) return '\0';
   return _source[_cur];
 }
 
@@ -50,7 +50,7 @@ Scanner::string() {
 
   advance(); // consume the closing "
 
-  std::string value = _source.substr(_start + 1, _cur - 1);
+  std::string value = _source.substr(_start + 1, _cur - _start - 2);
   addToken(TokenType::STRING, Value{value});
 }
 
@@ -79,7 +79,7 @@ Scanner::identifier() {
   // See if the identifier is a reserved word.
   std::string text = _source.substr(_start, _cur);
   auto it = _keywords.find(text);
-  if (it != _keywords.end()) {
+  if (it == _keywords.end()) {
     addToken(TokenType::IDENTIFIER);
     return;
   }
@@ -160,13 +160,14 @@ Scanner::scanToken() {
   // meet string
   case '"': string(); break;
 
+  // newline
+  case '\n': _line++; break;
 
   default:
-    if (std::isdigit(c))
+    if (isDigit(c))
       number();
-    else if (isAlpha(c)) {
+    else if (isAlpha(c))
       identifier();
-    }
     else
       error(_line, "meet unexpected character");
     break;

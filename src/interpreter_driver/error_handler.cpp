@@ -17,7 +17,6 @@ void error(int line, const std::string& message) {
 void report(int line, const std::string& message, const std::string& where) {
     std::string error_string = std::format("Error: {} \n line {}: {}", message, line, where);
     std::cerr << error_string;
-    exit(1);
 }
 
 }
