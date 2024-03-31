@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 #include "interpreter_driver/initializer.h"
+#include "scanner.h"
+#include "token.h"
 
 namespace loxcc {
 
@@ -37,7 +39,11 @@ void runPrompt() {
 }
 
 void run(const std::string& source) {
-    std::cout << source;
+    Scanner scanner(source);
+    scanner.scanTokens();
+    for (const auto& token : scanner._tokens) {
+        std::cout << Token::toString(token) << std::endl;
+    }
 }
 
 }

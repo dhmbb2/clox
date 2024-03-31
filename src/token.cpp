@@ -1,5 +1,5 @@
 #include <string>
-#include <type/token.h>
+#include <token.h>
 
 namespace loxcc {
 
