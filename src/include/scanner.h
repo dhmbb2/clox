@@ -4,7 +4,7 @@
 #include <map>
 #include <token.h>
 
-namespace loxcc {
+namespace clox {
 
 /// @brief Scanner class, with source code stored in _source
 class Scanner {

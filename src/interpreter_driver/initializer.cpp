@@ -7,7 +7,7 @@
 #include "scanner.h"
 #include "token.h"
 
-namespace loxcc {
+namespace clox {
 
 bool had_error = false;
 

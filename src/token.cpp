@@ -1,7 +1,7 @@
 #include <string>
 #include <token.h>
 
-namespace loxcc {
+namespace clox {
 
 std::string 
 type2string(TokenType type) {

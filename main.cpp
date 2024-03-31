@@ -8,10 +8,10 @@ int main (int argc, char** argv) {
         exit(64);
     } else if (argc == 2) {
         std::cout << "Running file: " << argv[1] << std::endl;
-        loxcc::runFile(argv[1]);
+        clox::runFile(argv[1]);
     } else {
         std::cout << "Running REPL" << std::endl;
-        loxcc::runPrompt();
+        clox::runPrompt();
     }
     return 0;
 }

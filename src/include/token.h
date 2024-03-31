@@ -4,7 +4,7 @@
 #include <optional>
 #include <iostream>
 
-namespace loxcc {
+namespace clox {
 
 enum class TokenType {
   // Single-character tokens.

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace loxcc {
+namespace clox {
 
 // Run a file
 void runFile(const char* path);

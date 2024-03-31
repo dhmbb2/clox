@@ -3,7 +3,7 @@
 #include <map>
 #include "interpreter_driver/error_handler.h"
 
-namespace loxcc
+namespace clox
 {
 
 
@@ -174,5 +174,5 @@ Scanner::scanToken() {
   }
 }
 
-} // namespace loxcc
+} // namespace clox
 

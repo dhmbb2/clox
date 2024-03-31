@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace loxcc {
+namespace clox {
 
 void error(int line, const std::string& message);
 

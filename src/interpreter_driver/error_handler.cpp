@@ -4,7 +4,7 @@
 #include "interpreter_driver/initializer.h"
 #include "interpreter_driver/error_handler.h"
 
-namespace loxcc{
+namespace clox{
 
 extern bool had_error;
 
