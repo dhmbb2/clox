@@ -32,7 +32,7 @@ type2string(TokenType);
 
 class Value {
 public:
-  Value() = delete;
+  Value(): _s(std::nullopt), _d(std::nullopt) {};
   Value(std::string s): _s({s}), _d(std::nullopt) {}
   Value(double d): _s(std::nullopt), _d({d}) {} 
 
