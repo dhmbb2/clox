@@ -1,16 +1,14 @@
 import os
 
 def define_visitor(f, base_name, types):
-    f.write("template <typename T>\n")
     f.write("class Visitor {\npublic:\n")
     for t in types:
         type_name = t.split("=")[0].strip()
-        f.write("    virtual T visit(const " + type_name + " &" + base_name.lower() + ") = 0;\n")
+        f.write("    virtual ReturnValType visit(const " + type_name + " &" + base_name.lower() + ") = 0;\n")
     f.write("};\n")
 
 def define_type(f, base_name, class_name, fields):
     f.write("// Expression " + class_name + "\n")
-    f.write("template <typename T>\n")
     f.write("class " + class_name + " : public " + base_name + " {\npublic:\n")
     f.write("  explicit " + class_name + "(" + fields + ") : ")
     # Store parameters in fields
@@ -23,7 +21,7 @@ def define_type(f, base_name, class_name, fields):
     f.write(" {}\n\n")
 
     # Define accept method
-    f.write("  T accept(Visitor<T> &visitor) const override {\n")
+    f.write("  ReturnValType accept(Visitor &visitor) const override {\n")
     f.write("    return visitor.visit(*this);\n")
     f.write("  }\n\n")
 
@@ -41,12 +39,13 @@ def define_ast(output_dir, base_name, types):
         f.write("#include <memory>\n")
         f.write("#include <vector>\n")
         f.write("#include <string>\n")
+        f.write("#include <variant>\n")
         f.write("#include \"token.h\"\n")
         f.write("\n")
         f.write("namespace clox {\n\n")
-        f.write("template <typename T>\n")
+        f.write("using ReturnValType = std::variant<double, std::string, bool>;\n\n")
         f.write("class " + base_name + " {\npublic:\n  virtual ~" + base_name + "() = default;\n")
-        f.write("  virtual T\n  accept(Visitor<T> &visitor) const = 0;\n")
+        f.write("  virtual ReturnValType\n  accept(Visitor &visitor) const = 0;\n")
         f.write("};\n\n")
         
         # define visitor class
