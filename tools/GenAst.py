@@ -44,7 +44,12 @@ def define_ast(output_dir, base_name, types):
         f.write("\n")
         f.write("namespace clox {\n\n")
         f.write("using ReturnValType = std::variant<double, std::string, bool>;\n\n")
-        f.write("class " + base_name + " {\npublic:\n  virtual ~" + base_name + "() = default;\n")
+        f.write("class Visitor;\n")
+        f.write("class Expr;\n")
+        for t in types:
+            class_name = t.split("=")[0].strip()
+            f.write("class " + class_name + ";\n")
+        f.write("\nclass " + base_name + " {\npublic:\n  virtual ~" + base_name + "() = default;\n")
         f.write("  virtual ReturnValType\n  accept(Visitor &visitor) const = 0;\n")
         f.write("};\n\n")
         

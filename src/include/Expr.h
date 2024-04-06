@@ -10,6 +10,13 @@ namespace clox {
 
 using ReturnValType = std::variant<double, std::string, bool>;
 
+class Visitor;
+class Expr;
+class Binary;
+class Grouping;
+class Literal;
+class Unary;
+
 class Expr {
 public:
   virtual ~Expr() = default;

@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 #include <utility>
@@ -54,7 +55,7 @@ public:
 
   void
   addToken(TokenType type) {
-    _tokens.push_back(Token{type, std::nullopt, std::nullopt, _line});
+    _tokens.push_back(Token{type, {type2string(type)}, std::nullopt, _line});
   }
 
   void

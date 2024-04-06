@@ -6,6 +6,8 @@
 #include "interpreter_driver/initializer.h"
 #include "scanner.h"
 #include "token.h"
+#include "parser.h"
+#include "printer.h"
 
 namespace clox {
 
@@ -41,9 +43,12 @@ void runPrompt() {
 void run(const std::string& source) {
     Scanner scanner(source);
     scanner.scanTokens();
-    for (const auto& token : scanner._tokens) {
-        std::cout << Token::toString(token) << std::endl;
-    }
+    Parser parser(scanner);
+    Printer printer;
+    auto expr = parser.parser();
+
+    if (had_error) {had_error = 0; return;}
+    std::cout << printer.print(expr.get()) << std::endl;
 }
 
 }

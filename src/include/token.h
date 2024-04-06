@@ -38,6 +38,15 @@ public:
 
   std::optional<std::string> _s;
   std::optional<double> _d;
+
+  std::string
+  toString() const {
+    if (_s.has_value()) {
+      return _s.value();
+    } else {
+      return std::to_string(_d.value());
+    }
+  }
 };
 
 class Token {
