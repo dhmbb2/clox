@@ -29,7 +29,7 @@ public:
   }
 
   ReturnValType visit(const Literal &expr) override {
-    return {expr.value.toString()};
+    return {Value::toString(expr.value)};
   }
 
   ReturnValType visit(const Unary &expr) override {

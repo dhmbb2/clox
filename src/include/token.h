@@ -3,6 +3,8 @@
 #include <string>
 #include <optional>
 #include <iostream>
+#include <variant>
+#include "value.h"
 
 namespace clox {
 
@@ -27,27 +29,9 @@ enum class TokenType {
   MYEOF
 };
 
+
 std::string 
 type2string(TokenType);
-
-class Value {
-public:
-  Value(): _s(std::nullopt), _d(std::nullopt) {};
-  Value(std::string s): _s({s}), _d(std::nullopt) {}
-  Value(double d): _s(std::nullopt), _d({d}) {} 
-
-  std::optional<std::string> _s;
-  std::optional<double> _d;
-
-  std::string
-  toString() const {
-    if (_s.has_value()) {
-      return _s.value();
-    } else {
-      return std::to_string(_d.value());
-    }
-  }
-};
 
 class Token {
 public:
