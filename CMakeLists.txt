@@ -16,9 +16,12 @@ add_executable(main
         src/include/Expr.h
         src/include/parser.h
         src/include/printer.h
+        src/include/interpreter.h
+        src/include/runtime_error.h
         src/interpreter_driver/error_handler.cpp
         src/interpreter_driver/initializer.cpp
         src/scanner.cpp
         src/token.cpp
         src/parser.cpp
+        src/interpreter.cpp
         main.cpp)

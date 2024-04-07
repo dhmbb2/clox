@@ -8,10 +8,12 @@
 #include "token.h"
 #include "parser.h"
 #include "printer.h"
+#include "interpreter.h"
 
 namespace clox {
 
 bool had_error = false;
+bool had_runtime_error = false;
 
 void runFile(const char* path) {
     // use istreambuf_iterator to read file into string
@@ -44,11 +46,13 @@ void run(const std::string& source) {
     Scanner scanner(source);
     scanner.scanTokens();
     Parser parser(scanner);
+    Interpreter interpreter;
     Printer printer;
     auto expr = parser.parser();
 
+    interpreter.interpret(*expr.get());
     if (had_error) {had_error = 0; return;}
-    std::cout << printer.print(expr.get()) << std::endl;
+    if (had_runtime_error) {had_runtime_error = 0; return;}
 }
 
 }

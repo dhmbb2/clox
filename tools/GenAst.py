@@ -43,7 +43,7 @@ def define_ast(output_dir, base_name, types):
         f.write("#include \"token.h\"\n")
         f.write("\n")
         f.write("namespace clox {\n\n")
-        f.write("using ReturnValType = std::variant<double, std::string, bool>;\n\n")
+        f.write("using ReturnValType = std::variant<std::monostate, Value, std::string, size_t>;\n\n")
         f.write("class Visitor;\n")
         f.write("class Expr;\n")
         for t in types:

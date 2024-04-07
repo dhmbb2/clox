@@ -8,7 +8,7 @@
 
 namespace clox {
 
-using ReturnValType = std::variant<double, std::string, bool>;
+using ReturnValType = std::variant<std::monostate, Value, std::string, size_t>;
 
 class Visitor;
 class Expr;
