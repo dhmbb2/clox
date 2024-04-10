@@ -77,7 +77,7 @@ Scanner::identifier() {
     advance();
 
   // See if the identifier is a reserved word.
-  std::string text = _source.substr(_start, _cur);
+  std::string text = _source.substr(_start, _cur-_start);
   auto it = _keywords.find(text);
   if (it == _keywords.end()) {
     addToken(TokenType::IDENTIFIER);

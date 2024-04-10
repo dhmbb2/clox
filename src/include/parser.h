@@ -81,6 +81,7 @@ public:
   std::unique_ptr<Stmt> statement();
   std::unique_ptr<Stmt> printStatement();
   std::unique_ptr<Stmt> expressionStatement();
+  std::unique_ptr<Stmt> blockStatement();
 
   // syn for error
   void synchronize();

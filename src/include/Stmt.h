@@ -16,6 +16,7 @@ class Stmt;
 class Expression;
 class Print;
 class Var;
+class Block;
 
 class Stmt {
 public:
@@ -24,6 +25,7 @@ public:
     virtual ReturnValType visit(const Expression &stmt) = 0;
     virtual ReturnValType visit(const Print &stmt) = 0;
     virtual ReturnValType visit(const Var &stmt) = 0;
+    virtual ReturnValType visit(const Block &stmt) = 0;
 };
 
 virtual ~Stmt() = default;
@@ -66,6 +68,18 @@ public:
 
   Token name;
   std::unique_ptr<Expr> initializer;
+};
+
+// Expression Block
+class Block : public Stmt {
+public:
+  explicit Block(std::vector<std::unique_ptr<Stmt>> statements) : statements(std::move(statements))  {}
+
+  ReturnValType accept(Visitor &visitor) const override {
+    return visitor.visit(*this);
+  }
+
+  std::vector<std::unique_ptr<Stmt>> statements;
 };
 
 }

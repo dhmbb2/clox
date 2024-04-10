@@ -130,6 +130,7 @@ namespace clox {
   Parser::declaration() {
     try {
       if (match(TokenType::VAR)) return Vardeclaration();
+      if (match(TokenType::LEFT_BRACE)) return blockStatement();
       return statement();
     } catch (ParserError) {
       synchronize();
@@ -172,6 +173,15 @@ namespace clox {
     auto expr = expression();
     consume(TokenType::SEMICOLON, "Expect ';' after statement.");
     return std::make_unique<Expression>(std::move(expr));
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::blockStatement() {
+    std::vector<std::unique_ptr<Stmt>> stmts;
+    while(!check(TokenType::RIGHT_BRACE) && !isAtEnd()) 
+      stmts.push_back(declaration());
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
+    return std::make_unique<Block>(std::move(stmts));
   }
 
   void

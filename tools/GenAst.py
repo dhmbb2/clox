@@ -90,7 +90,8 @@ if __name__ == "__main__":
     define_ast(output_dir, "Stmt", [
         "Expression = std::unique_ptr<Expr> expression",
         "Print      = std::unique_ptr<Expr> expression",
-        "Var        = Token name, std::unique_ptr<Expr> initializer"
+        "Var        = Token name, std::unique_ptr<Expr> initializer",
+        "Block      = std::vector<std::unique_ptr<Stmt>> statements",
     ])
 
 

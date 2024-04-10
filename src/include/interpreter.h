@@ -1,4 +1,5 @@
 #pragma once
+#include <stack>
 #include "Expr.h"
 #include "Stmt.h"
 #include "parser.h"
@@ -10,7 +11,9 @@ namespace clox
 
 class Interpreter: public Expr::Visitor, public Stmt::Visitor {
 public:
-  Interpreter() = default;
+  Interpreter() {
+    environments.push(Environment());
+  };
 
   ReturnValType visit(const Binary &expr) override;
   ReturnValType visit(const Grouping &expr) override;
@@ -21,6 +24,7 @@ public:
   ReturnValType visit(const Expression &stmt) override;
   ReturnValType visit(const Print &stmt) override;
   ReturnValType visit(const Var &stmt) override;
+  ReturnValType visit(const Block &stmt) override;
 
   void interpret(std::vector<std::unique_ptr<Stmt>> stmts);
   ReturnValType evaluate(const Expr& expr);
@@ -40,7 +44,7 @@ public:
     throw RuntimeError(op, "Operands must be numbers.");
   }
 
-  Environment environment;
+  std::stack<Environment> environments{};
 };
 
 } // namespace clox
