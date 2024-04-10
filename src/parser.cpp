@@ -7,18 +7,38 @@
 
 namespace clox {  
 
-  std::unique_ptr<Expr>
-  Parser::parser() {
-    try {
-      return std::move(expression());
-    } catch (ParserError) {
-      return nullptr;
-    }
+  std::vector<std::unique_ptr<Stmt>>
+  Parser::parse() {
+    std::vector<std::unique_ptr<Stmt>> statements;
+    while (!isAtEnd())
+      statements.emplace_back(declaration());
+    return std::move(statements);
   }
 
   std::unique_ptr<Expr>
   Parser::expression() {
-    return std::move(equality());
+    return std::move(assignment());
+  }
+
+  std::unique_ptr<Expr>
+  Parser::assignment() {
+    auto left = equality();
+
+    if (!match(TokenType::EQUAL))
+      return std::move(left);
+
+    Token equal = previous();
+    // if the left is an variable
+    if (auto var = dynamic_cast<Variable*>(left.get()); var != nullptr) {
+      Token token = var->name;
+      auto value = assignment();
+      return std::make_unique<Assignment>(token, std::move(value));
+    }
+
+    // this is because we can transpass this mistake by returning it as a  
+    // equality() expression, we don't need to panic
+    parser_error(equal, "Invalid assignment target.");
+    return std::move(left);
   }
 
   std::unique_ptr<Expr>
@@ -87,6 +107,8 @@ namespace clox {
     if (match(TokenType::NIL)) return std::make_unique<Literal>(Value());
     if (match(TokenType::NUMBER, TokenType::STRING)) 
       return std::make_unique<Literal>(previous()._literal.value());
+    if (match(TokenType::IDENTIFIER))
+      return std::move(variable());
 
     if (match(TokenType::LEFT_PAREN)) {
       auto expr = expression();
@@ -96,6 +118,60 @@ namespace clox {
 
     throw parser_error(peek(), "Expect expression.");
     
+  }
+
+
+  std::unique_ptr<Expr>
+  Parser::variable() {
+    return std::make_unique<Variable>(previous());
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::declaration() {
+    try {
+      if (match(TokenType::VAR)) return Vardeclaration();
+      return statement();
+    } catch (ParserError) {
+      synchronize();
+      return nullptr;
+    }
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::Vardeclaration() {
+    Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
+
+    // if an assignment is present
+    if (match(TokenType::EQUAL)) {
+      auto initializer = expression();
+      consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
+      return std::make_unique<Var>(name, std::move(initializer));
+    }
+
+    consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
+    return std::make_unique<Var>(name, nullptr);
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::statement() {
+    if (match(TokenType::PRINT))
+      return std::move(printStatement());
+    
+    return expressionStatement();
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::printStatement() {
+    auto expr = expression();
+    consume(TokenType::SEMICOLON, "Expect ';' after statement.");
+    return std::make_unique<Print>(std::move(expr));
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::expressionStatement() {
+    auto expr = expression();
+    consume(TokenType::SEMICOLON, "Expect ';' after statement.");
+    return std::make_unique<Expression>(std::move(expr));
   }
 
   void

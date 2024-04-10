@@ -55,7 +55,8 @@ public:
 
   void
   addToken(TokenType type) {
-    _tokens.push_back(Token{type, {type2string(type)}, std::nullopt, _line});
+    std::string lexeme = _source.substr(_start, _cur - _start);
+    _tokens.push_back(Token{type, lexeme, std::nullopt, _line});
   }
 
   void

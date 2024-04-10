@@ -14,7 +14,7 @@ extern bool had_runtime_error;
 void error(Token token, const std::string& message) {
     had_error = true;
     int line = token._line;
-    std::string where = token._lexeme.value_or("empty string");
+    std::string where = token._lexeme;
     if (token._type == TokenType::MYEOF)
         report(line, message, "at end");
     else

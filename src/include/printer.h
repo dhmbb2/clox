@@ -6,7 +6,7 @@
 namespace clox
 {
 
-class Printer: public Visitor {
+class Printer: public Expr::Visitor {
 public:
   std::string print(Expr* expr) {
     return std::get<std::string>(expr->accept(*this));
@@ -21,7 +21,7 @@ public:
   }
 
   ReturnValType visit(const Binary &expr) override {
-    return parenthesize(expr.op._lexeme.value(), expr.left.get(), expr.right.get());
+    return parenthesize(expr.op._lexeme, expr.left.get(), expr.right.get());
   }
 
   ReturnValType visit(const Grouping &expr) override {
@@ -33,7 +33,7 @@ public:
   }
 
   ReturnValType visit(const Unary &expr) override {
-    return parenthesize(expr.op._lexeme.value(), expr.right.get());
+    return parenthesize(expr.op._lexeme, expr.right.get());
     }
 
 };

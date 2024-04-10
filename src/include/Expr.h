@@ -16,22 +16,25 @@ class Binary;
 class Grouping;
 class Literal;
 class Unary;
+class Assignment;
+class Variable;
 
 class Expr {
 public:
-  virtual ~Expr() = default;
-  virtual ReturnValType
-  accept(Visitor &visitor) const = 0;
-};
-
 class Visitor {
 public:
     virtual ReturnValType visit(const Binary &expr) = 0;
     virtual ReturnValType visit(const Grouping &expr) = 0;
     virtual ReturnValType visit(const Literal &expr) = 0;
     virtual ReturnValType visit(const Unary &expr) = 0;
+    virtual ReturnValType visit(const Assignment &expr) = 0;
+    virtual ReturnValType visit(const Variable &expr) = 0;
 };
 
+virtual ~Expr() = default;
+  virtual ReturnValType
+  accept(Visitor &visitor) const = 0;
+};
 
 // Expression Binary
 class Binary : public Expr {
@@ -82,6 +85,31 @@ public:
 
   Token op;
   std::unique_ptr<Expr> right;
+};
+
+// Expression Assignment
+class Assignment : public Expr {
+public:
+  explicit Assignment(Token name, std::unique_ptr<Expr> value) : name(std::move(name)), value(std::move(value))  {}
+
+  ReturnValType accept(Visitor &visitor) const override {
+    return visitor.visit(*this);
+  }
+
+  Token name;
+  std::unique_ptr<Expr> value;
+};
+
+// Expression Variable
+class Variable : public Expr {
+public:
+  explicit Variable(Token name) : name(std::move(name))  {}
+
+  ReturnValType accept(Visitor &visitor) const override {
+    return visitor.visit(*this);
+  }
+
+  Token name;
 };
 
 }

@@ -41,21 +41,25 @@ def define_ast(output_dir, base_name, types):
         f.write("#include <string>\n")
         f.write("#include <variant>\n")
         f.write("#include \"token.h\"\n")
+        if base_name == "Stmt":
+            f.write("#include \"Expr.h\"\n")
         f.write("\n")
         f.write("namespace clox {\n\n")
         f.write("using ReturnValType = std::variant<std::monostate, Value, std::string, size_t>;\n\n")
         f.write("class Visitor;\n")
-        f.write("class Expr;\n")
+        f.write(f"class {base_name};\n")
         for t in types:
             class_name = t.split("=")[0].strip()
             f.write("class " + class_name + ";\n")
-        f.write("\nclass " + base_name + " {\npublic:\n  virtual ~" + base_name + "() = default;\n")
-        f.write("  virtual ReturnValType\n  accept(Visitor &visitor) const = 0;\n")
-        f.write("};\n\n")
-        
+        f.write("\nclass " + base_name + " {\npublic:\n")
         # define visitor class
         define_visitor(f, base_name, types)
-        f.write("\n\n")
+        f.write("\n")
+        
+        f.write("virtual ~" + base_name + "() = default;\n")
+        f.write("  virtual ReturnValType\n  accept(Visitor &visitor) const = 0;\n")
+        f.write("};\n\n")
+    
 
         for t in types:
             class_name = t.split("=")[0].strip()
@@ -78,7 +82,15 @@ if __name__ == "__main__":
         "Binary   = std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
         "Grouping = std::unique_ptr<Expr> expression",
         "Literal  = Value value",
-        "Unary    = Token op, std::unique_ptr<Expr> right"
+        "Unary    = Token op, std::unique_ptr<Expr> right",
+        "Assignment = Token name, std::unique_ptr<Expr> value",
+        "Variable = Token name",
+    ])
+
+    define_ast(output_dir, "Stmt", [
+        "Expression = std::unique_ptr<Expr> expression",
+        "Print      = std::unique_ptr<Expr> expression",
+        "Var        = Token name, std::unique_ptr<Expr> initializer"
     ])
 
 

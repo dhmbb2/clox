@@ -1,4 +1,5 @@
 #pragma once
+#include "interpreter.h"
 
 namespace clox {
 
@@ -9,6 +10,6 @@ void runFile(const char* path);
 void runPrompt();
 
 // Run a line
-void run(const std::string& source);
+void run(const std::string& source, Interpreter& Interpreter);
 
 }

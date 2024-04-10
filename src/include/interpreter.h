@@ -1,12 +1,14 @@
 #pragma once
 #include "Expr.h"
+#include "Stmt.h"
 #include "parser.h"
 #include "runtime_error.h"
+#include "environment.h"
 
 namespace clox
 {
 
-class Interpreter: public Visitor {
+class Interpreter: public Expr::Visitor, public Stmt::Visitor {
 public:
   Interpreter() = default;
 
@@ -14,9 +16,15 @@ public:
   ReturnValType visit(const Grouping &expr) override;
   ReturnValType visit(const Literal &expr) override;
   ReturnValType visit(const Unary &expr) override;
+  ReturnValType visit(const Variable &expr) override;
+  ReturnValType visit(const Assignment &expr) override;
+  ReturnValType visit(const Expression &stmt) override;
+  ReturnValType visit(const Print &stmt) override;
+  ReturnValType visit(const Var &stmt) override;
 
-  void interpret(const Expr& expr);
+  void interpret(std::vector<std::unique_ptr<Stmt>> stmts);
   ReturnValType evaluate(const Expr& expr);
+  ReturnValType execute(const Stmt& stmt);
   
   // error reporting functions
   void checkNumber(const Token &op, const Value &operand) {
@@ -32,6 +40,7 @@ public:
     throw RuntimeError(op, "Operands must be numbers.");
   }
 
+  Environment environment;
 };
 
 } // namespace clox

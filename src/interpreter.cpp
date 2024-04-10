@@ -4,7 +4,8 @@
 
 namespace clox
 {
-    
+
+// interpret Binary expression
 ReturnValType
 Interpreter::visit(const Binary &expr) {
   Value left = std::get<Value>(evaluate(*expr.left.get()));
@@ -72,16 +73,19 @@ Interpreter::visit(const Binary &expr) {
   }
 }
 
+// interpret Grouping expression
 ReturnValType
 Interpreter::visit(const Grouping &expr) {
   return evaluate(*expr.expression.get());
 }
 
+// interpret Literal expression
 ReturnValType
 Interpreter::visit(const Literal &expr) {
   return {expr.value};
 }
 
+// interpret Unary expression
 ReturnValType
 Interpreter::visit(const Unary &expr) {
   Value right = std::get<Value>(evaluate(*expr.right.get()));
@@ -101,16 +105,62 @@ Interpreter::visit(const Unary &expr) {
   return {};
 }
 
+//interpret Var expression
+ReturnValType
+Interpreter::visit(const Variable& expr) {
+  return {environment.get(expr.name)};
+}
+
+//interpret assignment expression
+ReturnValType
+Interpreter::visit(const Assignment& expr) {
+  Value value = std::get<Value>(evaluate(*expr.value.get()));
+  environment.assign(expr.name, value);
+  return {value};
+}
+
+// interpret print statement
+ReturnValType
+Interpreter::visit(const Print &stmt) {
+  // return type of expression must be value
+  Value value = std::get<Value>(evaluate(*stmt.expression.get()));
+  std::cout << Value::toString(value) << '\n';
+  return {};
+}
+
+// interpret var declaration
+ReturnValType
+Interpreter::visit(const Var& stmt) {
+  Value value = Value();
+  if (stmt.initializer != nullptr)
+    value = std::get<Value>(evaluate(*stmt.initializer.get()));
+  environment.define(stmt.name, value);
+  return {};
+}
+
+// interpret expression statement
+ReturnValType
+Interpreter::visit(const Expression &stmt) {
+  evaluate(*stmt.expression.get());
+  return {};
+}
+
 ReturnValType
 Interpreter::evaluate(const Expr& expr) {
   return expr.accept(*this);
 }
 
+ReturnValType
+Interpreter::execute(const Stmt& stmt) {
+  return stmt.accept(*this);
+}
+
 void
-Interpreter::interpret(const Expr& expr) {
+Interpreter::interpret(std::vector<std::unique_ptr<Stmt>> stmts) {
   try {
-    Value result = std::get<Value>(evaluate(expr));
-    std::cout << Value::toString(result) << std::endl;
+    for (auto& stmt: stmts)
+      if (stmt != nullptr)
+        execute(*stmt.get());
   } catch (const RuntimeError &error) {
     runtime_error(error);
   }
