@@ -108,14 +108,14 @@ Interpreter::visit(const Unary &expr) {
 //interpret Var expression
 ReturnValType
 Interpreter::visit(const Variable& expr) {
-  return {environments.top().get(expr.name)};
+  return {environments.get(expr.name)};
 }
 
 //interpret assignment expression
 ReturnValType
 Interpreter::visit(const Assignment& expr) {
   Value value = std::get<Value>(evaluate(*expr.value.get()));
-  environments.top().assign(expr.name, value);
+  environments.assign(expr.name, value);
   return {value};
 }
 
@@ -134,7 +134,7 @@ Interpreter::visit(const Var& stmt) {
   Value value = Value();
   if (stmt.initializer != nullptr)
     value = std::get<Value>(evaluate(*stmt.initializer.get()));
-  environments.top().define(stmt.name, value);
+  environments.define(stmt.name, value);
   return {};
 }
 
@@ -148,7 +148,7 @@ Interpreter::visit(const Expression &stmt) {
 ReturnValType
 Interpreter::visit(const Block &stmt) {
   // use RAII to protect the stack
-  EnvironmentStackPopper popper{environments};
+  EnvironmentStackPopper popper{environments._environments};
   for (auto& st : stmt.statements) 
     if (st != nullptr)
       execute(*st.get());

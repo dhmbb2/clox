@@ -1,5 +1,5 @@
 #pragma once
-#include <stack>
+#include <vector>
 #include "Expr.h"
 #include "Stmt.h"
 #include "parser.h"
@@ -12,7 +12,7 @@ namespace clox
 class Interpreter: public Expr::Visitor, public Stmt::Visitor {
 public:
   Interpreter() {
-    environments.push(Environment());
+    EnvironmentStack();
   };
 
   ReturnValType visit(const Binary &expr) override;
@@ -44,7 +44,7 @@ public:
     throw RuntimeError(op, "Operands must be numbers.");
   }
 
-  std::stack<Environment> environments{};
+  EnvironmentStack environments{};
 };
 
 } // namespace clox
