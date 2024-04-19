@@ -55,6 +55,7 @@ EnvironmentStack::assign(Token token, Value value) {
   for (int i = _environments.size()-1 ; i >= 0; --i) {
     try {
       _environments[i].assign(token, value);
+      return;
     } catch(RuntimeError& error) {
       continue;
     }

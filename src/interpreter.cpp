@@ -156,6 +156,25 @@ Interpreter::visit(const Block &stmt) {
 }
 
 ReturnValType
+Interpreter::visit(const IF &stmt) {
+  Value condition = std::get<Value>(evaluate(*stmt.condition.get()));
+  if (Value::isTruthy(condition)) 
+    return execute(*stmt.thenBranch.get());
+  if (stmt.elseBranch != nullptr)
+    execute(*stmt.elseBranch.get());
+  return {};
+}
+
+ReturnValType
+Interpreter::visit(const WHILE &stmt) {
+  // when the condition isn't met, keep looping
+  while(Value::isTruthy(std::get<Value>(evaluate(*stmt.condition.get())))) {
+    execute(*stmt.body.get());
+  }
+  return {};
+}
+
+ReturnValType
 Interpreter::evaluate(const Expr& expr) {
   return expr.accept(*this);
 }

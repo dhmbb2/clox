@@ -17,6 +17,8 @@ class Expression;
 class Print;
 class Var;
 class Block;
+class IF;
+class WHILE;
 
 class Stmt {
 public:
@@ -26,6 +28,8 @@ public:
     virtual ReturnValType visit(const Print &stmt) = 0;
     virtual ReturnValType visit(const Var &stmt) = 0;
     virtual ReturnValType visit(const Block &stmt) = 0;
+    virtual ReturnValType visit(const IF &stmt) = 0;
+    virtual ReturnValType visit(const WHILE &stmt) = 0;
 };
 
 virtual ~Stmt() = default;
@@ -80,6 +84,33 @@ public:
   }
 
   std::vector<std::unique_ptr<Stmt>> statements;
+};
+
+// Expression IF
+class IF : public Stmt {
+public:
+  explicit IF(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, std::unique_ptr<Stmt> elseBranch) : condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch))  {}
+
+  ReturnValType accept(Visitor &visitor) const override {
+    return visitor.visit(*this);
+  }
+
+  std::unique_ptr<Expr> condition;
+  std::unique_ptr<Stmt> thenBranch;
+  std::unique_ptr<Stmt> elseBranch;
+};
+
+// Expression WHILE
+class WHILE : public Stmt {
+public:
+  explicit WHILE(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body) : condition(std::move(condition)), body(std::move(body))  {}
+
+  ReturnValType accept(Visitor &visitor) const override {
+    return visitor.visit(*this);
+  }
+
+  std::unique_ptr<Expr> condition;
+  std::unique_ptr<Stmt> body;
 };
 
 }

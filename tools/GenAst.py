@@ -92,6 +92,8 @@ if __name__ == "__main__":
         "Print      = std::unique_ptr<Expr> expression",
         "Var        = Token name, std::unique_ptr<Expr> initializer",
         "Block      = std::vector<std::unique_ptr<Stmt>> statements",
+        "IF         = std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, std::unique_ptr<Stmt> elseBranch",
+        "WHILE      = std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body",
     ])
 
 

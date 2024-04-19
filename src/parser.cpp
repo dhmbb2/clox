@@ -130,7 +130,6 @@ namespace clox {
   Parser::declaration() {
     try {
       if (match(TokenType::VAR)) return Vardeclaration();
-      if (match(TokenType::LEFT_BRACE)) return blockStatement();
       return statement();
     } catch (ParserError) {
       synchronize();
@@ -157,6 +156,14 @@ namespace clox {
   Parser::statement() {
     if (match(TokenType::PRINT))
       return std::move(printStatement());
+    if (match(TokenType::LEFT_BRACE)) 
+      return std::move(blockStatement());
+    if (match(TokenType::WHILE)) 
+      return std::move(whileStatement());
+    if (match(TokenType::IF))
+      return std::move(ifStatement());
+    if (match(TokenType::FOR))
+      return std::move(forStatement());
     
     return expressionStatement();
   }
@@ -182,6 +189,72 @@ namespace clox {
       stmts.push_back(declaration());
     consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
     return std::make_unique<Block>(std::move(stmts));
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::ifStatement() {
+    consume(TokenType::LEFT_PAREN, "expect '(' before condition");
+    auto condition = expression();
+    consume(TokenType::RIGHT_PAREN, "expect ')' after condition");
+    auto thenBranch = statement();
+
+    std::unique_ptr<Stmt> elseBranch = nullptr;
+    if (match(TokenType::ELSE))
+      elseBranch = statement();
+
+    return std::make_unique<IF>(std::move(condition), std::move(thenBranch), std::move(elseBranch));
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::whileStatement() {
+    consume(TokenType::LEFT_PAREN, "expect '(' before condition");
+    auto condition = expression();
+    consume(TokenType::RIGHT_PAREN, "expect ')' after condition");
+    auto body = statement();
+
+    return std::make_unique<WHILE>(std::move(condition), std::move(body));
+  }
+
+  std::unique_ptr<Stmt>
+  Parser::forStatement() {
+    consume(TokenType::LEFT_PAREN, "expect '(' before for statement");
+    // parse initializer
+    std::unique_ptr<Stmt> initializer = nullptr;
+    if (match(TokenType::SEMICOLON))
+      initializer = nullptr;
+    else if (match(TokenType::VAR))
+      initializer = Vardeclaration();
+    else 
+      initializer = expressionStatement();
+    
+    // parse condition
+    std::unique_ptr<Expr> condition = nullptr;
+    if (!check(TokenType::SEMICOLON))
+      condition = expression();
+    consume(TokenType::SEMICOLON, "expect ';' after for condition");
+    
+    // parse increment
+    std::unique_ptr<Expr> increment = nullptr;
+    if (!check(TokenType::RIGHT_BRACE))
+      increment = expression();
+    consume(TokenType::RIGHT_BRACE, "expect ')' after for condition");
+
+    std::unique_ptr<Stmt> body = statement();
+
+    // desugaring for statement to while statement
+    std::vector<std::unique_ptr<Stmt>> while_body;
+    if (initializer != nullptr)
+      while_body.emplace_back(std::move(initializer));
+
+    while_body.emplace_back(std::move(body));
+
+    if (increment != nullptr)
+      while_body.emplace_back(std::make_unique<Expression>(std::move(increment)));
+
+    if (condition == nullptr)
+      condition = std::make_unique<Literal>(Value(true));
+
+    return std::make_unique<WHILE>(std::move(condition), std::make_unique<Block>(std::move(while_body)));  
   }
 
   void

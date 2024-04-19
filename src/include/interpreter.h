@@ -25,6 +25,8 @@ public:
   ReturnValType visit(const Print &stmt) override;
   ReturnValType visit(const Var &stmt) override;
   ReturnValType visit(const Block &stmt) override;
+  ReturnValType visit(const IF &stmt) override;
+  ReturnValType visit(const WHILE &stmt) override;
 
   void interpret(std::vector<std::unique_ptr<Stmt>> stmts);
   ReturnValType evaluate(const Expr& expr);
