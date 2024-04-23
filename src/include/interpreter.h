@@ -12,8 +12,9 @@ namespace clox
 class Interpreter: public Expr::Visitor, public Stmt::Visitor {
 public:
   Interpreter() {
-    EnvironmentStack();
-  };
+    global = std::make_shared<Environment>();
+    environment = global;
+  }
 
   ReturnValType visit(const Binary &expr) override;
   ReturnValType visit(const Grouping &expr) override;
@@ -46,7 +47,8 @@ public:
     throw RuntimeError(op, "Operands must be numbers.");
   }
 
-  EnvironmentStack environments{};
+  std::shared_ptr<Environment> global;
+  std::shared_ptr<Environment> environment;
 };
 
 } // namespace clox

@@ -8,59 +8,40 @@ namespace clox {
 Value
 Environment::get(Token token) {
   std::string name = token._lexeme;
-  auto it = values.find(name);
-  if (it == values.end())
-    throw RuntimeError(token, std::format("Undefined variable: {}.", name));
-  return it->second;
+  
+  auto it = _values.find(name);
+  if (it != _values.end())
+    return it->second;
+  
+  if (_enclosing != nullptr)
+    return _enclosing->get(token);
+  
+  throw RuntimeError(token, std::format("Undefined variable: {}.", name));
 }
 
 void
 Environment::define(Token token, Value value) {
   std::string name = token._lexeme;
-  values[name] = value;
+  _values[name] = value;
 }
 
 void
 Environment::assign(Token token, Value value) {
   std::string name = token._lexeme;
-  auto it = values.find(name);
-  if (it == values.end())
-    throw RuntimeError(token, std::format("Undefined variable: {}.", name));
-  it->second = value;
-}
+  auto it = _values.find(name);
 
-Value
-EnvironmentStack::get(Token token) {
-  std::string name = token._lexeme;
-  for (int i = _environments.size()-1 ; i >= 0; --i) {
-    try {
-      Value v = _environments[i].get(token);
-      return v;
-    } catch(RuntimeError& error) {
-      continue;
-    }
+  if (it != _values.end()) {
+    it->second = value;
+    return;
   }
-  throw RuntimeError(token, std::format("Undefined variable: {}.", name));
-  return {};
-}
 
-void
-EnvironmentStack::define(Token token, Value value) {
-  _environments.back().define(token, value);
-}
-
-void
-EnvironmentStack::assign(Token token, Value value) {
-  std::string name = token._lexeme;
-  for (int i = _environments.size()-1 ; i >= 0; --i) {
-    try {
-      _environments[i].assign(token, value);
-      return;
-    } catch(RuntimeError& error) {
-      continue;
-    }
+  if (_enclosing != nullptr) {
+    _enclosing->assign(token, value);
+    return;
   }
+
   throw RuntimeError(token, std::format("Undefined variable: {}.", name));
 }
+
 
 } // namespace clox

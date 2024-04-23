@@ -85,6 +85,7 @@ if __name__ == "__main__":
         "Unary    = Token op, std::unique_ptr<Expr> right",
         "Assignment = Token name, std::unique_ptr<Expr> value",
         "Variable = Token name",
+        "Logical = std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
     ])
 
     define_ast(output_dir, "Stmt", [

@@ -108,14 +108,14 @@ Interpreter::visit(const Unary &expr) {
 //interpret Var expression
 ReturnValType
 Interpreter::visit(const Variable& expr) {
-  return {environments.get(expr.name)};
+  return {environment->get(expr.name)};
 }
 
 //interpret assignment expression
 ReturnValType
 Interpreter::visit(const Assignment& expr) {
   Value value = std::get<Value>(evaluate(*expr.value.get()));
-  environments.assign(expr.name, value);
+  environment->assign(expr.name, value);
   return {value};
 }
 
@@ -134,7 +134,7 @@ Interpreter::visit(const Var& stmt) {
   Value value = Value();
   if (stmt.initializer != nullptr)
     value = std::get<Value>(evaluate(*stmt.initializer.get()));
-  environments.define(stmt.name, value);
+  environment->define(stmt.name, value);
   return {};
 }
 
@@ -147,11 +147,17 @@ Interpreter::visit(const Expression &stmt) {
 
 ReturnValType
 Interpreter::visit(const Block &stmt) {
-  // use RAII to protect the stack
-  EnvironmentStackPopper popper{environments._environments};
-  for (auto& st : stmt.statements) 
-    if (st != nullptr)
-      execute(*st.get());
+  std::shared_ptr<Environment> block_environment = std::make_shared<Environment>(environment);
+  environment = block_environment;
+  try {
+    for (auto& st : stmt.statements) 
+      if (st != nullptr)
+        execute(*st.get());
+  } catch (RuntimeError e) {
+    environment = block_environment->_enclosing;
+    throw(e);
+  }
+  environment = block_environment->_enclosing;
   return {};
 }
 

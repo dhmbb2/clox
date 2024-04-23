@@ -18,6 +18,7 @@ class Literal;
 class Unary;
 class Assignment;
 class Variable;
+class Logical;
 
 class Expr {
 public:
@@ -29,6 +30,7 @@ public:
     virtual ReturnValType visit(const Unary &expr) = 0;
     virtual ReturnValType visit(const Assignment &expr) = 0;
     virtual ReturnValType visit(const Variable &expr) = 0;
+    // virtual ReturnValType visit(const Logical &expr) = 0;
 };
 
 virtual ~Expr() = default;
@@ -111,5 +113,19 @@ public:
 
   Token name;
 };
+
+// // Expression Logical
+// class Logical : public Expr {
+// public:
+//   explicit Logical(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right) : left(std::move(left)), op(std::move(op)), right(std::move(right))  {}
+
+//   ReturnValType accept(Visitor &visitor) const override {
+//     return visitor.visit(*this);
+//   }
+
+//   std::unique_ptr<Expr> left;
+//   Token op;
+//   std::unique_ptr<Expr> right;
+// };
 
 }
