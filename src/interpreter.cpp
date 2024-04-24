@@ -105,6 +105,22 @@ Interpreter::visit(const Unary &expr) {
   return {};
 }
 
+// interpret Logical expression
+ReturnValType
+Interpreter::visit(const Logical &expr) {
+  bool left = Value::isTruthy(std::get<Value>(evaluate(*expr.left.get())));
+
+  // early return if the expression is already fixed with half side
+  if (expr.op._type == TokenType::AND) {
+    if (!left) return {Value{false}};
+  } else {
+    if (left) return {Value{true}};
+  }
+
+  bool right = Value::isTruthy(std::get<Value>(evaluate(*expr.right.get())));
+  return {Value{right}};
+}
+
 //interpret Var expression
 ReturnValType
 Interpreter::visit(const Variable& expr) {

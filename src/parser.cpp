@@ -22,7 +22,7 @@ namespace clox {
 
   std::unique_ptr<Expr>
   Parser::assignment() {
-    auto left = equality();
+    auto left = ex_or();
 
     if (!match(TokenType::EQUAL))
       return std::move(left);
@@ -39,6 +39,29 @@ namespace clox {
     // equality() expression, we don't need to panic
     parser_error(equal, "Invalid assignment target.");
     return std::move(left);
+  }
+
+
+  std::unique_ptr<Expr>
+  Parser::ex_or() {
+    auto left = ex_and();
+    if (!match(TokenType::OR))
+      return std::move(left);
+
+    Token or_token = previous();
+    auto right = ex_or();
+    return std::make_unique<Logical>(std::move(left), or_token, std::move(right));
+  }
+
+  std::unique_ptr<Expr>
+  Parser::ex_and() {
+    auto left = equality();
+    if (!match(TokenType::AND))
+      return std::move(left);
+    
+    Token and_token = previous();
+    auto right = ex_and();
+    return std::make_unique<Logical>(std::move(left), and_token, std::move(right));
   }
 
   std::unique_ptr<Expr>
@@ -235,26 +258,28 @@ namespace clox {
     
     // parse increment
     std::unique_ptr<Expr> increment = nullptr;
-    if (!check(TokenType::RIGHT_BRACE))
+    if (!check(TokenType::RIGHT_PAREN))
       increment = expression();
-    consume(TokenType::RIGHT_BRACE, "expect ')' after for condition");
+    consume(TokenType::RIGHT_PAREN, "expect ')' after for condition");
 
     std::unique_ptr<Stmt> body = statement();
 
     // desugaring for statement to while statement
     std::vector<std::unique_ptr<Stmt>> while_body;
-    if (initializer != nullptr)
-      while_body.emplace_back(std::move(initializer));
-
     while_body.emplace_back(std::move(body));
-
     if (increment != nullptr)
       while_body.emplace_back(std::make_unique<Expression>(std::move(increment)));
 
     if (condition == nullptr)
       condition = std::make_unique<Literal>(Value(true));
+    auto while_block = std::make_unique<WHILE>(std::move(condition), std::make_unique<Block>(std::move(while_body))); 
 
-    return std::make_unique<WHILE>(std::move(condition), std::make_unique<Block>(std::move(while_body)));  
+    std::vector<std::unique_ptr<Stmt>> for_body;
+    if (initializer != nullptr)
+      for_body.emplace_back(std::move(initializer));
+    for_body.emplace_back(std::move(while_block));
+
+    return std::make_unique<Block>(std::move(for_body));  
   }
 
   void

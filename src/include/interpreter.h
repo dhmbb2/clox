@@ -20,6 +20,7 @@ public:
   ReturnValType visit(const Grouping &expr) override;
   ReturnValType visit(const Literal &expr) override;
   ReturnValType visit(const Unary &expr) override;
+  ReturnValType visit(const Logical &expr) override;
   ReturnValType visit(const Variable &expr) override;
   ReturnValType visit(const Assignment &expr) override;
   ReturnValType visit(const Expression &stmt) override;
